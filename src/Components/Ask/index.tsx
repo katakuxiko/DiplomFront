@@ -1,5 +1,5 @@
 import { Button, Form, Input, Spin } from "antd";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { rules } from "../../utils/rules";
 import { SendOutlined } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
@@ -17,8 +17,13 @@ interface message {
 
 export const Ask = ({ id }: AskProps) => {
 	const [messages, setMessages] = useState<message[]>([]);
+	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	const [form] = Form.useForm();
+
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
 
 	const mutation = useMutation({
 		mutationFn: async ({ question }: { question: string }) => {
@@ -39,7 +44,7 @@ export const Ask = ({ id }: AskProps) => {
 
 	return (
 		<div className="flex flex-col h-full relative">
-			<div className="flex flex-col gap-4 mb-12 p-4">
+			<div className="flex flex-col gap-4 mb-12 p-4 overflow-y-auto">
 				{messages.map((message, index) => (
 					<div
 						key={index}
@@ -47,7 +52,7 @@ export const Ask = ({ id }: AskProps) => {
 							message.type === "me"
 								? "text-right self-end"
 								: "text-left self-start"
-						} p-3 rounded-2xl bg-white border border-gray-400 max-w-[80%] shadow-md`}
+						} p-3 rounded-2xl bg-white border border-gray-400/30 max-w-[80%] shadow-md overflow-y-auto`}
 					>
 						<div className="self-start text-right font-semibold">
 							{message.type === "me" ? undefined : "Бот"}
@@ -65,8 +70,9 @@ export const Ask = ({ id }: AskProps) => {
 						<Spin />
 					</div>
 				)}
+				<div ref={messagesEndRef} />
 			</div>
-			<div className="fixed bottom-0 right-4 w-full max-w-md">
+			<div className="fixed bottom-0 right-4 w-full max-w-md ">
 				<Form form={form} onFinish={mutation.mutate}>
 					<Form.Item name="question" rules={[rules.required]}>
 						<Input
@@ -80,6 +86,7 @@ export const Ask = ({ id }: AskProps) => {
 								/>
 							}
 							placeholder="Задайте вопрос"
+							className="shadow-2xl"
 						/>
 					</Form.Item>
 				</Form>
