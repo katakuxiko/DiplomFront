@@ -90,6 +90,7 @@ export interface DtoPaginatedDocuments {
 }
 
 export interface ModelsAskRequest {
+  chat_id?: string;
   model?: string;
   query?: string;
   topK?: number;

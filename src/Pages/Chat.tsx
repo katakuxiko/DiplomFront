@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import { api } from "../axios";
 import { useSetHead } from "../hooks";
 import { Documents } from "../Components/Documents";
+import { Ask } from "../Components/Ask";
 
 export const Chat = () => {
 	const { id } = useParams();
@@ -23,11 +24,12 @@ export const Chat = () => {
 			label: `Документы`,
 			children: <Documents id={id!} />,
 		},
+		{
+			key: "2",
+			label: `Задать вопрос`,
+			children: <Ask id={id!} />,
+		},
 	];
 
-	return (
-		<div>
-			<Tabs items={items} />
-		</div>
-	);
+	return <Tabs items={items} />;
 };
