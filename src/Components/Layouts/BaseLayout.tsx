@@ -16,7 +16,7 @@ export const BaseLayout = () => {
 					<NabBar />
 				</Sider>
 				<Layout>
-					<Header className="bg-white! py-2! shadow-md">
+					<Header className="bg-white! py-2! px-4! shadow-md">
 						<Typography.Title>{name}</Typography.Title>
 					</Header>
 					<Content className="h-full p-4">
