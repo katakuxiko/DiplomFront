@@ -5,6 +5,7 @@ import { AuthLayout } from "./Components/Layouts/AuthLayout";
 import { BaseLayout } from "./Components/Layouts/BaseLayout";
 import { LoginPage } from "./Pages/Login";
 import { Chats } from "./Pages/Chats";
+import { Chat } from "./Pages/Chat";
 
 const router = createBrowserRouter([
 	{
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
 			{
 				path: "",
 				element: <Chats />,
+			},
+			{
+				path: "chat/:id",
+				element: <Chat />,
+			},
+			{
+				path: "/settings",
+				element: <div>Settings Page</div>,
 			},
 		],
 	},

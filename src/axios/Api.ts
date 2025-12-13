@@ -25,7 +25,6 @@ export interface DtoAdminResponse {
 }
 
 export interface DtoChatCreateRequest {
-  admin_id?: string;
   /** @example "Обсуждение проекта" */
   descr?: string;
   /** @example "Project Chat" */
@@ -648,16 +647,18 @@ export class Api<
   };
   documents = {
     /**
-     * @description Возвращает список документов с пагинацией
+     * @description Возвращает список документов для конкретного чата с пагинацией
      *
      * @tags documents
      * @name DocumentsList
-     * @summary Получить документы с пагинацией
+     * @summary Получить документы чата с пагинацией
      * @request GET:/documents
      * @secure
      */
     documentsList: (
-      query?: {
+      query: {
+        /** Chat ID (UUID) */
+        chat_id: string;
         /**
          * Номер страницы
          * @default 1
