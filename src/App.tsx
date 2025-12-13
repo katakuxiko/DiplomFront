@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { setupAxios } from "./axios";
 import { AuthLayout } from "./Components/Layouts/AuthLayout";
@@ -39,9 +39,15 @@ const router = createBrowserRouter([
 ]);
 
 export const App = () => {
+	const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		setupAxios();
+		setLoading(false);
 	}, []);
+
+	if(loading) {
+		return <div className=''></div>;
+	}
 
 	return <RouterProvider router={router} />;
 };

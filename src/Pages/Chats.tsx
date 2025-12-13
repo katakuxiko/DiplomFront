@@ -1,6 +1,6 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Drawer, Empty, Form, Input } from "antd";
+import { Button, Drawer, Empty, Form, Input, Skeleton } from "antd";
 import { api } from "../axios";
 import { useEffect, useState } from "react";
 import { rules } from "../utils/rules";
@@ -20,7 +20,7 @@ export const Chats = () => {
 	const queryClient = useQueryClient();
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
-	const { data } = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: ["chats"],
 		queryFn: async () => {
 			return api.chats.chatsList();
@@ -70,6 +70,10 @@ export const Chats = () => {
 				}
 			/>
 		);
+	}
+
+	if (isLoading) {
+		return <Skeleton active paragraph={{ rows: 10 }} />;
 	}
 
 	return (

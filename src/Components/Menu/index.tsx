@@ -31,7 +31,7 @@ export const NabBar = () => {
 	const location = useLocation();
 
 	return (
-		<div className='fixed'>
+		<div className="fixed">
 			<Typography.Title className="text-gray-400! pl-4" level={3}>
 				{user?.username}
 			</Typography.Title>
@@ -39,6 +39,7 @@ export const NabBar = () => {
 				selectedKeys={[location.pathname]}
 				mode="vertical"
 				theme="dark"
+				className="w-48"
 				items={items}
 				onClick={(i) => {
 					if (i.key === "logout") {
