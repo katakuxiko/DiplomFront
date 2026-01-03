@@ -50,9 +50,15 @@ export const Chats = () => {
 		}
 	}, [initItem, form]);
 
-	if (!data || data.data.length === 0) {
-		return (
-			<Empty
+
+
+	if (isLoading) {
+		return <Skeleton active paragraph={{ rows: 10 }} />;
+	}
+
+	return (
+		<>
+			{!data || data?.data?.length === 0 && <Empty
 				description={
 					<div className="flex flex-col gap-2">
 						Нет чатов.
@@ -68,16 +74,8 @@ export const Chats = () => {
 						</div>
 					</div>
 				}
-			/>
-		);
-	}
-
-	if (isLoading) {
-		return <Skeleton active paragraph={{ rows: 10 }} />;
-	}
-
-	return (
-		<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 flex-wrap items-center">
+			/>}
+		{data && data.data.length > 0 &&  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 flex-wrap items-center">
 			{data?.data.map((chat) => (
 				<div
 					className="flex flex-col gap-2 p-4 bg-white rounded-xl shadow-xl min-h-full hover:scale-[1.03] transition-transform cursor-pointer"
@@ -102,6 +100,9 @@ export const Chats = () => {
 					<div>{chat.descr}</div>
 				</div>
 			))}
+
+		
+
 			<Button
 				icon={<PlusOutlined />}
 				type="primary"
@@ -112,7 +113,10 @@ export const Chats = () => {
 				Создать
 			</Button>
 
-			<Drawer
+			
+		</div>}
+		
+		<Drawer
 				title={initItem ? "Редактировать чат" : "Создать чат"}
 				open={isOpen}
 				onClose={() => {
@@ -179,6 +183,6 @@ export const Chats = () => {
 					</Form.Item>
 				</Form>
 			</Drawer>
-		</div>
+		</>
 	);
 };

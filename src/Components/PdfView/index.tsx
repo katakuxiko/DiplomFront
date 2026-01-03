@@ -1,10 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Spin } from "antd";
-import { useEffect, useState, useRef, memo, useCallback } from "react";
+import { useEffect, useState, useRef, memo, useCallback, ComponentType } from "react";
 import "react-pdf/dist/Page/TextLayer.css";
+import { useAuth } from "../../store/authStore";
+
+interface DocumentProps {
+	file?: string | { url: string; httpHeaders?: Record<string, string> };
+	onLoadSuccess?: (pdf: { numPages: number }) => void;
+	onLoadError?: (error: Error) => void;
+	loading?: React.ReactNode;
+	error?: React.ReactNode;
+	children?: React.ReactNode;
+}
+
+interface PageProps {
+	pageNumber: number;
+	width?: number;
+	renderTextLayer?: boolean;
+	renderAnnotationLayer?: boolean;
+}
+
+interface PdfComponents {
+	Document: ComponentType<DocumentProps>;
+	Page: ComponentType<PageProps>;
+}
 
 const PdfViewerComponent = ({ url }: { url: string }) => {
-	const [PdfComponent, setPdfComponent] = useState<any>(null);
+	const [PdfComponent, setPdfComponent] = useState<PdfComponents | null>(null);
 	const [numPages, setNumPages] = useState<number>(0);
 	const [error, setError] = useState<string | null>(null);
 	const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -76,11 +97,15 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 	return (
 		<div onDoubleClick={handleDoubleClick}>
 			<Document
-				file={url ? `http://${url}` : undefined}
+				file={url ? { url: `${import.meta.env.VITE_BASE_URL}${url}`, httpHeaders: {
+					Authorization: `Bearer ${useAuth.getState().accessToken}`,
+				} } : undefined}
+				
 				onLoadSuccess={({ numPages }: { numPages: number }) => {
 					setNumPages(numPages);
 					setError(null);
 				}}
+				
 				onLoadError={(error: Error) => {
 					console.error("PDF load error:", error);
 					setError(error.message);

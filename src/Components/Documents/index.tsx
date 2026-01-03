@@ -89,7 +89,7 @@ export const Documents = ({ id }: DocumentsProps) => {
 			<Table
 				onRow={(record) => ({
 					onClick: () => {
-						setRowUrl(record.full_path);
+						setRowUrl(`documents/${record.id}/download`);
 					},
 				})}
 				columns={columns}
