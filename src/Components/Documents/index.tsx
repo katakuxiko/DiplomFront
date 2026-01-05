@@ -5,6 +5,7 @@ import {
 	Drawer,
 	message,
 	notification,
+	Popconfirm,
 	Table,
 	TableProps,
 	Upload,
@@ -12,6 +13,7 @@ import {
 import dayjs from "dayjs";
 import { useState } from "react";
 import PdfViewer from "../PdfView";
+import { DeleteOutlined } from "@ant-design/icons";
 
 interface DocumentsProps {
 	id: string;
@@ -58,6 +60,7 @@ export const Documents = ({ id }: DocumentsProps) => {
 			message.loading({
 				content: "Загрузка документа...",
 				key: "uploadDoc",
+				duration: 0,
 			});
 			return api.documents.uploadCreate({ chat_id: id, file });
 		},
@@ -110,6 +113,21 @@ export const Documents = ({ id }: DocumentsProps) => {
 				onClose={() => setRowUrl(undefined)}
 				open={!!rowUrl}
 				title="Просмотр документа"
+				extra={
+					<Popconfirm title="Вы уверены, что хотите удалить этот документ?" okText="Да" cancelText="Нет" onConfirm={()=>{
+						api.documents.documentsDelete(rowUrl!.split('/')[1]).then(()=>{
+							notification.success({
+								message: "Документ успешно удален",
+								duration: 2,
+							});
+							setRowUrl(undefined);
+							queryClient.invalidateQueries({ queryKey: ["documents", id] });
+						});
+					}}>
+
+						<Button icon={<DeleteOutlined />} danger type="primary">Удалить</Button>
+					</Popconfirm>
+				}
 			>
 				<PdfViewer url={rowUrl ?? ""} />
 			</Drawer>
