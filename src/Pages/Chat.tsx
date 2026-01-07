@@ -5,6 +5,7 @@ import { api } from "../axios";
 import { useSetHead } from "../hooks";
 import { Documents } from "../Components/Documents";
 import { Ask } from "../Components/Ask";
+import { Settings } from "../Components/Settings";
 
 export const Chat = () => {
 	const { id } = useParams();
@@ -19,17 +20,22 @@ export const Chat = () => {
 	useSetHead(chat ? `Чат ${chat.data.name}` : "Чат");
 
 	const items = [
-		{
-			key: "1",
-			label: `Документы`,
-			children: <Documents id={id!} />,
-		},
-		{
-			key: "2",
-			label: `Задать вопрос`,
-			children: <Ask id={id!} />,
-		},
-	];
+    {
+      key: "1",
+      label: `Документы`,
+      children: <Documents id={id!} />,
+    },
+    {
+      key: "3",
+      label: "Настройки",
+      children: <Settings id={id!}/>,
+    },
+    {
+      key: "2",
+      label: `Задать вопрос`,
+      children: <Ask id={id!} />,
+    },
+  ];
 
 	return <Tabs items={items} />;
 };

@@ -39,6 +39,34 @@ export interface DtoChatResponse {
   name?: string;
 }
 
+export interface DtoChatSettingCreateRequest {
+  chatID: string;
+  descr?: string;
+  helloText?: string;
+  name?: string;
+  settings?: ModelsJSONB;
+  url?: string;
+}
+
+export interface DtoChatSettingResponse {
+  chatID?: string;
+  createdDate?: string;
+  descr?: string;
+  helloText?: string;
+  id?: string;
+  name?: string;
+  settings?: ModelsJSONB;
+  url?: string;
+}
+
+export interface DtoChatSettingUpdateRequest {
+  descr?: string;
+  helloText?: string;
+  name?: string;
+  settings?: ModelsJSONB;
+  url?: string;
+}
+
 export interface DtoChatUserCreateRequest {
   /** @example "secret123" */
   password?: string;
@@ -106,6 +134,8 @@ export interface ModelsDocument {
   path?: string;
   protected?: boolean;
 }
+
+export type ModelsJSONB = Record<string, any>;
 
 export interface ModelsRule {
   description?: string;
@@ -398,7 +428,7 @@ export class Api<
      * @request POST:/ask
      */
     postAsk: (request: ModelsAskRequest, params: RequestParams = {}) =>
-      this.request<Record<string, any>, Record<string, string>>({
+      this.request<ModelsJSONB, Record<string, string>>({
         path: `/ask`,
         method: "POST",
         body: request,
@@ -423,6 +453,125 @@ export class Api<
         body: request,
         type: ContentType.Json,
         format: "json",
+        ...params,
+      }),
+  };
+  chatSettings = {
+    /**
+     * @description Возвращает список всех настроек чатов
+     *
+     * @tags chat-settings
+     * @name ChatSettingsList
+     * @summary Получить все настройки чатов
+     * @request GET:/chat-settings
+     * @secure
+     */
+    chatSettingsList: (params: RequestParams = {}) =>
+      this.request<DtoChatSettingResponse[], Record<string, string>>({
+        path: `/chat-settings`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Создает новые настройки чата или обновляет существующие по chat_id
+     *
+     * @tags chat-settings
+     * @name ChatSettingsCreate
+     * @summary Создать или обновить настройки чата
+     * @request POST:/chat-settings
+     * @secure
+     */
+    chatSettingsCreate: (
+      settings: DtoChatSettingCreateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<DtoChatSettingResponse, Record<string, string>>({
+        path: `/chat-settings`,
+        method: "POST",
+        body: settings,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Возвращает настройки для указанного чата
+     *
+     * @tags chat-settings
+     * @name ChatDetail
+     * @summary Получить настройки по ID чата
+     * @request GET:/chat-settings/chat/{chatId}
+     * @secure
+     */
+    chatDetail: (chatId: string, params: RequestParams = {}) =>
+      this.request<DtoChatSettingResponse, Record<string, string>>({
+        path: `/chat-settings/chat/${chatId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Возвращает настройки чата по ID записи настроек
+     *
+     * @tags chat-settings
+     * @name ChatSettingsDetail
+     * @summary Получить настройки чата по ID настройки
+     * @request GET:/chat-settings/{id}
+     * @secure
+     */
+    chatSettingsDetail: (id: string, params: RequestParams = {}) =>
+      this.request<DtoChatSettingResponse, Record<string, string>>({
+        path: `/chat-settings/${id}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Обновляет настройки чата по ID
+     *
+     * @tags chat-settings
+     * @name ChatSettingsUpdate
+     * @summary Обновить настройки чата
+     * @request PUT:/chat-settings/{id}
+     * @secure
+     */
+    chatSettingsUpdate: (
+      id: string,
+      settings: DtoChatSettingUpdateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<DtoChatSettingResponse, Record<string, string>>({
+        path: `/chat-settings/${id}`,
+        method: "PUT",
+        body: settings,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Удаляет настройки чата по ID
+     *
+     * @tags chat-settings
+     * @name ChatSettingsDelete
+     * @summary Удалить настройки чата
+     * @request DELETE:/chat-settings/{id}
+     * @secure
+     */
+    chatSettingsDelete: (id: string, params: RequestParams = {}) =>
+      this.request<void, Record<string, string>>({
+        path: `/chat-settings/${id}`,
+        method: "DELETE",
+        secure: true,
         ...params,
       }),
   };
@@ -775,6 +924,23 @@ export class Api<
       this.request<void, Record<string, string>>({
         path: `/documents/${id}`,
         method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Возвращает файл документа для скачивания
+     *
+     * @tags documents
+     * @name DownloadList
+     * @summary Скачать файл документа
+     * @request GET:/documents/{id}/download
+     * @secure
+     */
+    downloadList: (id: string, params: RequestParams = {}) =>
+      this.request<File, Record<string, string>>({
+        path: `/documents/${id}/download`,
+        method: "GET",
         secure: true,
         ...params,
       }),
