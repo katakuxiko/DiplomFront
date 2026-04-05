@@ -154,8 +154,10 @@ import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams
-  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams extends Omit<
+  AxiosRequestConfig,
+  "data" | "params" | "url" | "responseType"
+> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -175,8 +177,10 @@ export type RequestParams = Omit<
   "body" | "method" | "query" | "path"
 >;
 
-export interface ApiConfig<SecurityDataType = unknown>
-  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown> extends Omit<
+  AxiosRequestConfig,
+  "data" | "cancelToken"
+> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -925,6 +929,30 @@ export class Api<
         path: `/documents/${id}`,
         method: "DELETE",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Обновляет уровень доступа документа
+     *
+     * @tags documents
+     * @name DocumentsUpdateAccess
+     * @summary Обновить access_level документа
+     * @request PUT:/documents/{id}/access
+     * @secure
+     */
+    documentsUpdateAccess: (
+      id: string,
+      data: { access_level: number },
+      params: RequestParams = {},
+    ) =>
+      this.request<DtoDocumentResponseDTO, Record<string, string>>({
+        path: `/documents/${id}/access`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
