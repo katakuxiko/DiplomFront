@@ -50,73 +50,72 @@ export const Chats = () => {
 		}
 	}, [initItem, form]);
 
-
-
 	if (isLoading) {
 		return <Skeleton active paragraph={{ rows: 10 }} />;
 	}
 
 	return (
 		<>
-			{!data || data?.data?.length === 0 && <Empty
-				description={
-					<div className="flex flex-col gap-2">
-						Нет чатов.
-						<div>
-							<Button
-								icon={<PlusOutlined />}
-								type="primary"
-								size="large"
-								onClick={() => setIsOpen(true)}
-							>
-								Создать
-							</Button>
-						</div>
-					</div>
-				}
-			/>}
-		{data && data.data.length > 0 &&  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 flex-wrap items-center">
-			{data?.data.map((chat) => (
-				<div
-					className="flex flex-col gap-2 p-4 bg-white rounded-xl shadow-xl min-h-full hover:scale-[1.03] transition-transform cursor-pointer"
-					key={chat.id}
-					tabIndex={1}
-					onClick={() => {
-						navigate(`/chat/${chat.id}`);
-					}}
-				>
-					<div className="flex justify-between">
-						<div className="font-semibold">{chat.name}</div>
-						<EditOutlined
-							onClick={(e) => {
-								e.stopPropagation();
-								setInitItem(chat);
-								setIsOpen(true);
+			{!data ||
+				(data?.data?.length === 0 && (
+					<Empty
+						description={
+							<div className="flex flex-col gap-2">
+								Нет чатов.
+								<div>
+									<Button
+										icon={<PlusOutlined />}
+										type="primary"
+										size="large"
+										onClick={() => setIsOpen(true)}
+									>
+										Создать
+									</Button>
+								</div>
+							</div>
+						}
+					/>
+				))}
+			{data && data.data.length > 0 && (
+				<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 flex-wrap items-center">
+					{data?.data?.map((chat) => (
+						<button
+							type="button"
+							className="flex text-start flex-col gap-2 p-4 bg-white rounded-xl shadow-xl min-h-full hover:scale-[1.03] transition-transform cursor-pointer"
+							key={chat.id}
+							onClick={() => {
+								navigate(`/chat/${chat.id}`);
 							}}
-							className="hover:bg-gray-400/30 p-1 rounded-md transition-colors"
-							style={{ fontSize: 20 }}
-						/>
-					</div>
-					<div>{chat.descr}</div>
+						>
+							<div className="flex justify-between">
+								<div className="font-semibold">{chat.name}</div>
+								<EditOutlined
+									onClick={(e) => {
+										e.stopPropagation();
+										setInitItem(chat);
+										setIsOpen(true);
+									}}
+									className="hover:bg-gray-400/30 p-1 rounded-md transition-colors"
+									style={{ fontSize: 20 }}
+								/>
+							</div>
+							<div>{chat.descr}</div>
+						</button>
+					))}
+
+					<Button
+						icon={<PlusOutlined />}
+						type="primary"
+						size="large"
+						onClick={() => setIsOpen(true)}
+						className="min-h-full"
+					>
+						Создать
+					</Button>
 				</div>
-			))}
+			)}
 
-		
-
-			<Button
-				icon={<PlusOutlined />}
-				type="primary"
-				size="large"
-				onClick={() => setIsOpen(true)}
-				className="min-h-full"
-			>
-				Создать
-			</Button>
-
-			
-		</div>}
-		
-		<Drawer
+			<Drawer
 				title={initItem ? "Редактировать чат" : "Создать чат"}
 				open={isOpen}
 				onClose={() => {
@@ -167,17 +166,10 @@ export const Chats = () => {
 						label="Описание"
 						name="descr"
 					>
-						<Input.TextArea
-							placeholder="Описание чата"
-							className="mt-4"
-						/>
+						<Input.TextArea placeholder="Описание чата" className="mt-4" />
 					</Form.Item>
 					<Form.Item>
-						<Button
-							type="primary"
-							htmlType="submit"
-							form="createChatForm"
-						>
+						<Button type="primary" htmlType="submit" form="createChatForm">
 							Сохранить
 						</Button>
 					</Form.Item>
