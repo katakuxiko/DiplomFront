@@ -2,33 +2,40 @@ import {
 	LogoutOutlined,
 	MessageOutlined,
 	SettingOutlined,
+	BarChartOutlined,
 } from "@ant-design/icons";
 import { Menu, MenuProps, Typography } from "antd";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../store/authStore";
 
-const items: MenuProps["items"] = [
-	{
-		key: "/",
-		label: "Чаты",
-		icon: <MessageOutlined />,
-	},
-	{
-		key: "/settings",
-		label: "Настройки",
-		icon: <SettingOutlined />,
-	},
-	{
-		key: "logout",
-		label: "Выйти",
-		icon: <LogoutOutlined />,
-	},
-];
-
 export const NabBar = () => {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
+
+	const items: MenuProps["items"] = [
+		{
+			key: "/",
+			label: "Чаты",
+			icon: <MessageOutlined />,
+		},
+		{
+			key: "/settings",
+			label: "Настройки",
+			icon: <SettingOutlined />,
+		},
+	];
+
+	// Показать страницу статистики только для админов (не для chat_user)
+	if (user && user.role && user.role !== "chat_user") {
+		items.push({
+			key: "/admin/stats",
+			label: "Статистика",
+			icon: <BarChartOutlined />,
+		});
+	}
+
+	items.push({ key: "logout", label: "Выйти", icon: <LogoutOutlined /> });
 
 	return (
 		<div className="fixed">

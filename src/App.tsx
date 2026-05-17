@@ -6,6 +6,7 @@ import { BaseLayout } from "./Components/Layouts/BaseLayout";
 import { LoginPage } from "./Pages/Login";
 import { Chats } from "./Pages/Chats";
 import { Chat } from "./Pages/Chat";
+import { AdminStats } from "./Pages/AdminStats";
 
 const router = createBrowserRouter([
 	{
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
 				element: <Chat />,
 			},
 			{
+				path: "admin/stats",
+				element: <AdminStats />,
+			},
+			{
 				path: "/settings",
 				element: <div>Settings Page</div>,
 			},
@@ -45,8 +50,8 @@ export const App = () => {
 		setLoading(false);
 	}, []);
 
-	if(loading) {
-		return <div className=''></div>;
+	if (loading) {
+		return <div className=""></div>;
 	}
 
 	return <RouterProvider router={router} />;
