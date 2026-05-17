@@ -1,19 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { FC, useEffect } from "react";
-import { api } from "../../axios";
-import type { DtoChatSettingCreateRequest } from "../../axios/Api";
 import {
+	Alert,
+	Button,
+	Divider,
 	Form,
 	Input,
-	Typography,
-	Button,
-	Spin,
-	Alert,
-	Divider,
 	InputNumber,
 	Select,
+	Spin,
+	Typography,
 	message,
 } from "antd";
+import { FC, useEffect } from "react";
+import { api } from "../../axios";
+import type { DtoChatSettingCreateRequest } from "../../axios/Api";
 
 interface SettingsProps {
 	id: string;

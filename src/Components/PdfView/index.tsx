@@ -1,5 +1,5 @@
 import { Spin } from "antd";
-import { useEffect, useState, useRef, memo, useCallback, ComponentType } from "react";
+import { ComponentType, memo, useCallback, useEffect, useRef, useState } from "react";
 import "react-pdf/dist/Page/TextLayer.css";
 import { useAuth } from "../../store/authStore";
 
@@ -48,6 +48,7 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 				const { Document, Page, pdfjs } = pdfModule;
 				// Устанавливаем worker
 				pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+				// @ts-expect-error
 				setPdfComponent({ Document, Page });
 			})
 			.catch((err) => {
