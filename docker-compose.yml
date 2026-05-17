@@ -12,6 +12,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_BASE_URL: ${VITE_BASE_URL:-https://back.avxm.live}
+        VITE_BASE_CHAT_URL: ${VITE_BASE_CHAT_URL:-https://avxm.live/}
     image: avxm/front-admin:latest
     ports:
       - "127.0.0.1:3000:80"
