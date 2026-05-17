@@ -3,36 +3,36 @@ import React, { FC, useEffect } from "react";
 import { api } from "../../axios";
 import type { DtoChatSettingCreateRequest } from "../../axios/Api";
 import {
-  Form,
-  Input,
-  Typography,
-  Button,
-  Spin,
-  Alert,
-  Divider,
-  InputNumber,
-  Select,
-  message,
+	Form,
+	Input,
+	Typography,
+	Button,
+	Spin,
+	Alert,
+	Divider,
+	InputNumber,
+	Select,
+	message,
 } from "antd";
 
 interface SettingsProps {
-  id: string;
+	id: string;
 }
 
 export const Settings: FC<SettingsProps> = ({ id }) => {
-  const [form] = Form.useForm();
-  const queryClient = useQueryClient();
-  const chatBase = (
-    import.meta.env.VITE_BASE_CHAT_URL ?? window.location.origin + "/"
-  ).replace(/\/$/, "");
-  const chatUrl = `${chatBase}/${id}`;
+	const [form] = Form.useForm();
+	const queryClient = useQueryClient();
+	const chatBase = (
+		import.meta.env.VITE_BASE_CHAT_URL ?? window.location.origin + "/"
+	).replace(/\/$/, "");
+	const chatUrl = `${chatBase}/${id}`;
 
-  const { data, isLoading, error } = useQuery({
-    queryFn: () => {
-      return api.chatSettings.chatDetail(id).then((data) => data.data);
-    },
-    queryKey: ["chat-settings", id],
-  });
+	const { data, isLoading, error } = useQuery({
+		queryFn: () => {
+			return api.chatSettings.chatDetail(id).then((data) => data.data);
+		},
+		queryKey: ["chat-settings", id],
+	});
 
 	// Загрузка списка моделей из бэкенда (LM Studio)
 	type LMModel = { id?: string; name?: string; model?: string };
@@ -74,16 +74,16 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 				descr: data.descr,
 				helloText: data.helloText,
 				url: data.url,
+				externalApiKey: data.settings?.externalApiKey || undefined,
+				embedExternalApiKey: data.settings?.embedExternalApiKey || undefined,
 				temperature: data.settings?.temperature || 0.7,
 				maxTokens: data.settings?.maxTokens || 2000,
 				model: data.settings?.model || undefined,
 				systemPrompt: data.settings?.systemPrompt || "",
 				enableHistory: data.settings?.enableHistory !== false,
 				provider: data.settings?.provider || "local",
-				externalApiKey: data.settings?.externalApiKey || undefined,
 				externalBaseUrl: data.settings?.externalBaseUrl || undefined,
 				embedProvider: data.settings?.embedProvider || "local",
-				embedExternalApiKey: data.settings?.embedExternalApiKey || undefined,
 				embedExternalBaseUrl: data.settings?.embedExternalBaseUrl || undefined,
 				requestsLimit: data.settings?.requestsLimit || 100,
 				requestsWindow: data.settings?.requestsWindow || 3600,
@@ -119,82 +119,82 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 		updateSettings(updateData);
 	};
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-96">
-        <Spin size="large" />
-      </div>
-    );
-  }
+	if (isLoading) {
+		return (
+			<div className="flex justify-center items-center min-h-96">
+				<Spin size="large" />
+			</div>
+		);
+	}
 
-  return (
-    <div>
-      <Typography.Title>Настройки</Typography.Title>
+	return (
+		<div>
+			<Typography.Title>Настройки</Typography.Title>
 
-      {error && (
-        <Alert
-          message="Ошибка загрузки настроек"
-          description="Не удалось загрузить настройки чата. Пожалуйста, попробуйте позже."
-          type="error"
-          showIcon
-          closable
-          className="mb-4"
-        />
-      )}
+			{error && (
+				<Alert
+					message="Ошибка загрузки настроек"
+					description="Не удалось загрузить настройки чата. Пожалуйста, попробуйте позже."
+					type="error"
+					showIcon
+					closable
+					className="mb-4"
+				/>
+			)}
 
-      <Form
-        form={form}
-        layout="vertical"
-        size="large"
-        onFinish={handleSubmit}
-        autoComplete="off"
-      >
-        {/* Основная информация */}
-        <Typography.Title level={4}>Основная информация</Typography.Title>
-        <div className="grid grid-cols-2 gap-x-4 mb-6">
-          <Form.Item
-            label="Название чата"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "Пожалуйста, введите название чата",
-              },
-            ]}
-          >
-            <Input placeholder="Название чата" />
-          </Form.Item>
+			<Form
+				form={form}
+				layout="vertical"
+				size="large"
+				onFinish={handleSubmit}
+				autoComplete="off"
+			>
+				{/* Основная информация */}
+				<Typography.Title level={4}>Основная информация</Typography.Title>
+				<div className="grid grid-cols-2 gap-x-4 mb-6">
+					<Form.Item
+						label="Название чата"
+						name="name"
+						rules={[
+							{
+								required: true,
+								message: "Пожалуйста, введите название чата",
+							},
+						]}
+					>
+						<Input placeholder="Название чата" />
+					</Form.Item>
 
-          <Form.Item label="URL">
-            <Input value={chatUrl} disabled placeholder="https://example.com" />
-            <a
-              href={chatUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              Перейти к чату
-            </a>
-          </Form.Item>
+					<Form.Item label="URL">
+						<Input value={chatUrl} disabled placeholder="https://example.com" />
+						<a
+							href={chatUrl}
+							target="_blank"
+							rel="noreferrer"
+							className="text-sm text-blue-600 hover:underline"
+						>
+							Перейти к чату
+						</a>
+					</Form.Item>
 
-          <Form.Item label="Описание" name="descr">
-            <Input.TextArea
-              placeholder="Описание чата"
-              rows={3}
-              className="col-span-2"
-            />
-          </Form.Item>
+					<Form.Item label="Описание" name="descr">
+						<Input.TextArea
+							placeholder="Описание чата"
+							rows={3}
+							className="col-span-2"
+						/>
+					</Form.Item>
 
-          <Form.Item label="Приветственное сообщение" name="helloText">
-            <Input.TextArea
-              placeholder="Приветственное сообщение для пользователей"
-              rows={3}
-              className="col-span-2"
-            />
-          </Form.Item>
-        </div>
+					<Form.Item label="Приветственное сообщение" name="helloText">
+						<Input.TextArea
+							placeholder="Приветственное сообщение для пользователей"
+							rows={3}
+							className="col-span-2"
+						/>
+					</Form.Item>
+				</div>
 
-        <Divider />
+				<Divider />
 
 				{/* Параметры модели */}
 				<Typography.Title level={4}>Параметры модели</Typography.Title>
@@ -278,34 +278,34 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 						}
 					</Form.Item>
 
-          <Form.Item
-            label="Температура (0-2)"
-            name="temperature"
-            rules={[
-              {
-                required: true,
-                message: "Пожалуйста, введите значение температуры",
-              },
-            ]}
-          >
-            <InputNumber min={0} max={2} step={0.1} placeholder="0.7" />
-          </Form.Item>
+					<Form.Item
+						label="Температура (0-2)"
+						name="temperature"
+						rules={[
+							{
+								required: true,
+								message: "Пожалуйста, введите значение температуры",
+							},
+						]}
+					>
+						<InputNumber min={0} max={2} step={0.1} placeholder="0.7" />
+					</Form.Item>
 
-          <Form.Item
-            label="Макс. токенов"
-            name="maxTokens"
-            rules={[
-              {
-                required: true,
-                message: "Пожалуйста, введите макс. токены",
-              },
-            ]}
-          >
-            <InputNumber min={100} max={128000} step={100} />
-          </Form.Item>
-        </div>
+					<Form.Item
+						label="Макс. токенов"
+						name="maxTokens"
+						rules={[
+							{
+								required: true,
+								message: "Пожалуйста, введите макс. токены",
+							},
+						]}
+					>
+						<InputNumber min={100} max={128000} step={100} />
+					</Form.Item>
+				</div>
 
-        <Divider />
+				<Divider />
 
 				{/* Провайдер */}
 				<Typography.Title level={4}>Провайдер</Typography.Title>
@@ -339,6 +339,12 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 									</Form.Item>
 									<Form.Item label="External API Key" name="externalApiKey">
 										<Input.Password placeholder="sk-..." />
+										{data?.settings?.externalApiKeySet &&
+											!data?.settings?.externalApiKey && (
+												<div className="text-sm text-gray-500 mt-1">
+													Ключ установлен (не отображается)
+												</div>
+											)}
 									</Form.Item>
 								</>
 							) : null
@@ -379,6 +385,12 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 										name="embedExternalApiKey"
 									>
 										<Input.Password placeholder="sk-..." />
+										{data?.settings?.embedExternalApiKeySet &&
+											!data?.settings?.embedExternalApiKey && (
+												<div className="text-sm text-gray-500 mt-1">
+													Ключ установлен (не отображается)
+												</div>
+											)}
 									</Form.Item>
 								</>
 							) : null
@@ -394,10 +406,10 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 					</Form.Item>
 				</div>
 
-        <Divider />
+				<Divider />
 
-        {/* Ограничения и история */}
-        {/* <Typography.Title level={4}>Ограничения и история</Typography.Title>
+				{/* Ограничения и история */}
+				{/* <Typography.Title level={4}>Ограничения и история</Typography.Title>
 				<div className="grid grid-cols-3 gap-x-4 mb-6">
 					<Form.Item
 						label="Включить историю сообщений"
@@ -434,21 +446,21 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 					</Form.Item>
 				</div> */}
 
-        {/* Кнопки действия */}
-        <div className="flex gap-2">
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            loading={isPending}
-          >
-            Сохранить
-          </Button>
-          <Button onClick={() => form.resetFields()} size="large">
-            Отменить
-          </Button>
-        </div>
-      </Form>
-    </div>
-  );
+				{/* Кнопки действия */}
+				<div className="flex gap-2">
+					<Button
+						type="primary"
+						htmlType="submit"
+						size="large"
+						loading={isPending}
+					>
+						Сохранить
+					</Button>
+					<Button onClick={() => form.resetFields()} size="large">
+						Отменить
+					</Button>
+				</div>
+			</Form>
+		</div>
+	);
 };
