@@ -30,6 +30,24 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 		queryKey: ["chat-settings", id],
 	});
 
+	// Загрузка списка моделей из бэкенда (LM Studio)
+	type LMModel = { id?: string; name?: string; model?: string };
+	const { data: modelsData } = useQuery<LMModel[]>({
+		queryFn: async () => {
+			try {
+				const res = await api.request<{ data: LMModel[] }>({
+					path: "/models",
+					method: "GET",
+				});
+				return Array.isArray(res.data) ? res.data : [];
+			} catch (e) {
+				return [];
+			}
+		},
+		queryKey: ["lm-models"],
+		staleTime: 1000 * 60 * 5,
+	});
+
 	const { mutate: updateSettings, isPending } = useMutation({
 		mutationFn: (values: DtoChatSettingCreateRequest) => {
 			return api.chatSettings
@@ -54,11 +72,18 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 				url: data.url,
 				temperature: data.settings?.temperature || 0.7,
 				maxTokens: data.settings?.maxTokens || 2000,
-				model: data.settings?.model || "gpt-4",
+				model: data.settings?.model || undefined,
 				systemPrompt: data.settings?.systemPrompt || "",
 				enableHistory: data.settings?.enableHistory !== false,
+				provider: data.settings?.provider || "local",
+				externalApiKey: data.settings?.externalApiKey || undefined,
+				externalBaseUrl: data.settings?.externalBaseUrl || undefined,
+				embedProvider: data.settings?.embedProvider || "local",
+				embedExternalApiKey: data.settings?.embedExternalApiKey || undefined,
+				embedExternalBaseUrl: data.settings?.embedExternalBaseUrl || undefined,
 				requestsLimit: data.settings?.requestsLimit || 100,
 				requestsWindow: data.settings?.requestsWindow || 3600,
+				embedModel: data.settings?.embedModel || undefined,
 			});
 		}
 	}, [data, form]);
@@ -76,8 +101,15 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 				model: values.model as string,
 				systemPrompt: values.systemPrompt as string | undefined,
 				enableHistory: values.enableHistory as boolean,
+				provider: values.provider as string,
+				externalApiKey: values.externalApiKey as string | undefined,
+				externalBaseUrl: values.externalBaseUrl as string | undefined,
+				embedProvider: values.embedProvider as string,
+				embedExternalApiKey: values.embedExternalApiKey as string | undefined,
+				embedExternalBaseUrl: values.embedExternalBaseUrl as string | undefined,
 				requestsLimit: values.requestsLimit as number,
 				requestsWindow: values.requestsWindow as number,
+				embedModel: values.embedModel as string | undefined,
 			},
 		};
 		updateSettings(updateData);
@@ -169,21 +201,81 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 				<div className="grid grid-cols-3 gap-x-4 mb-6">
 					<Form.Item
 						label="Модель AI"
-						name="model"
-						rules={[
-							{
-								required: true,
-								message: "Пожалуйста, выберите модель",
-							},
-						]}
+						shouldUpdate={(prev, cur) => prev.provider !== cur.provider}
 					>
-						<Select
-							placeholder="Выберите модель"
-							options={[
-								{ label: "EssentialAI RNJ-1", value: "essentialai/rnj-1" },
-								{ label: "Google Gemma 3N E4B", value: "google/gemma-3n-e4b" },
-							]}
-						/>
+						{() =>
+							form.getFieldValue("provider") === "external" ? (
+								<Form.Item
+									name="model"
+									rules={[
+										{
+											required: true,
+											message: "Пожалуйста, введите имя модели",
+										},
+									]}
+								>
+									<Input placeholder="Введите имя модели (например: deepseek-ai/DeepSeek-V4-Pro:novita)" />
+								</Form.Item>
+							) : (
+								<Form.Item
+									name="model"
+									rules={[
+										{ required: true, message: "Пожалуйста, выберите модель" },
+									]}
+								>
+									<Select
+										placeholder="Выберите модель"
+										options={(Array.isArray(modelsData) ? modelsData : []).map(
+											(m: LMModel) => ({
+												label: m.id || m.name || m.model,
+												value: m.id || m.name || m.model,
+											}),
+										)}
+										notFoundContent={
+											isLoading ? "Загрузка..." : "Модели не найдены"
+										}
+									/>
+								</Form.Item>
+							)
+						}
+					</Form.Item>
+
+					<Form.Item
+						label="Модель для эмбеддингов"
+						shouldUpdate={(prev, cur) =>
+							prev.embedProvider !== cur.embedProvider
+						}
+					>
+						{() =>
+							form.getFieldValue("embedProvider") === "external" ? (
+								<Form.Item
+									name="embedModel"
+									rules={[
+										{
+											required: true,
+											message: "Пожалуйста, введите имя модели для эмбеддингов",
+										},
+									]}
+								>
+									<Input placeholder="Введите модель для эмбеддингов (например: sentence-transformers/all-MiniLM-L6-v2)" />
+								</Form.Item>
+							) : (
+								<Form.Item name="embedModel">
+									<Select
+										placeholder="Выберите модель для эмбеддингов"
+										options={(Array.isArray(modelsData) ? modelsData : []).map(
+											(m: LMModel) => ({
+												label: m.id || m.name || m.model,
+												value: m.id || m.name || m.model,
+											}),
+										)}
+										notFoundContent={
+											isLoading ? "Загрузка..." : "Модели не найдены"
+										}
+									/>
+								</Form.Item>
+							)
+						}
 					</Form.Item>
 
 					<Form.Item
@@ -214,6 +306,85 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 				</div>
 
 				<Divider />
+
+				{/* Провайдер */}
+				<Typography.Title level={4}>Провайдер</Typography.Title>
+				<div className="grid grid-cols-2 gap-x-4 mb-6">
+					<Form.Item
+						label="Провайдер"
+						name="provider"
+						rules={[{ required: true }]}
+					>
+						<Select
+							options={[
+								{ label: "Локальный (LM Studio)", value: "local" },
+								{ label: "Внешний (API key)", value: "external" },
+							]}
+						/>
+					</Form.Item>
+
+					{/* Показывать поля только если выбран внешний провайдер */}
+					<Form.Item
+						shouldUpdate={(prev, cur) => prev.provider !== cur.provider}
+						noStyle
+					>
+						{() =>
+							form.getFieldValue("provider") === "external" ? (
+								<>
+									<Form.Item
+										label="External API Base URL"
+										name="externalBaseUrl"
+									>
+										<Input placeholder="https://api.openai.com/v1" />
+									</Form.Item>
+									<Form.Item label="External API Key" name="externalApiKey">
+										<Input.Password placeholder="sk-..." />
+									</Form.Item>
+								</>
+							) : null
+						}
+					</Form.Item>
+
+					{/* Провайдер для эмбеддингов */}
+					<Form.Item
+						label="Провайдер эмбеддингов"
+						name="embedProvider"
+						rules={[{ required: true }]}
+					>
+						<Select
+							options={[
+								{ label: "Локальный (LM Studio)", value: "local" },
+								{ label: "Внешний (API key)", value: "external" },
+							]}
+						/>
+					</Form.Item>
+
+					<Form.Item
+						shouldUpdate={(prev, cur) =>
+							prev.embedProvider !== cur.embedProvider
+						}
+						noStyle
+					>
+						{() =>
+							form.getFieldValue("embedProvider") === "external" ? (
+								<>
+									<Form.Item
+										label="Embed External Base URL"
+										name="embedExternalBaseUrl"
+									>
+										<Input placeholder="https://api.openai.com/v1" />
+									</Form.Item>
+									<Form.Item
+										label="Embed External API Key"
+										name="embedExternalApiKey"
+									>
+										<Input.Password placeholder="sk-..." />
+									</Form.Item>
+								</>
+							) : null
+						}
+					</Form.Item>
+				</div>
 
 				{/* Системные настройки */}
 				<Typography.Title level={4}>Системные настройки</Typography.Title>
