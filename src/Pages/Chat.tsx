@@ -6,36 +6,48 @@ import { useSetHead } from "../hooks";
 import { Documents } from "../Components/Documents";
 import { Ask } from "../Components/Ask";
 import { Settings } from "../Components/Settings";
+import { ChatUsers } from "../Components/ChatUsers";
+import { ChatHistory } from "../Components/ChatHistory";
 
 export const Chat = () => {
-	const { id } = useParams();
+  const { id } = useParams();
 
-	const { data: chat } = useQuery({
-		queryKey: ["chat", id],
-		queryFn: async () => {
-			return api.chats.chatsDetail(id!);
-		},
-	});
+  const { data: chat } = useQuery({
+    queryKey: ["chat", id],
+    queryFn: async () => {
+      return api.chats.chatsDetail(id!);
+    },
+  });
 
-	useSetHead(chat ? `Чат ${chat.data.name}` : "Чат");
+  useSetHead(chat ? `Чат ${chat.data.name}` : "Чат");
 
-	const items = [
+  const items = [
     {
-      key: "1",
-      label: `Документы`,
+      key: "users",
+      label: "Пользователи",
+      children: <ChatUsers id={id!} />,
+    },
+    {
+      key: "history",
+      label: "История",
+      children: <ChatHistory id={id!} />,
+    },
+    {
+      key: "docs",
+      label: "Документы",
       children: <Documents id={id!} />,
     },
     {
-      key: "3",
+      key: "settings",
       label: "Настройки",
-      children: <Settings id={id!}/>,
+      children: <Settings id={id!} />,
     },
     {
-      key: "2",
-      label: `Задать вопрос`,
+      key: "ask",
+      label: "Задать вопрос",
       children: <Ask id={id!} />,
     },
   ];
 
-	return <Tabs items={items} />;
+  return <Tabs items={items} />;
 };
