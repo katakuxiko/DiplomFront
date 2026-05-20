@@ -22,6 +22,18 @@ interface SettingsProps {
 export const Settings: FC<SettingsProps> = ({ id }) => {
 	const [form] = Form.useForm();
 	const queryClient = useQueryClient();
+
+	const DEFAULTS = {
+		name: "Новый чат",
+		descr: "Чат для работы с документами",
+		helloText:
+			"Привет! Я помогу найти информацию в загруженных документах. Задайте ваш вопрос.",
+		temperature: 0.7,
+		maxTokens: 2000,
+		enableHistory: true,
+		provider: "local",
+		embedProvider: "local",
+	};
 	const chatBase = (
 		import.meta.env.VITE_BASE_CHAT_URL ?? window.location.origin + "/"
 	).replace(/\/$/, "");
@@ -68,28 +80,26 @@ export const Settings: FC<SettingsProps> = ({ id }) => {
 	});
 
 	useEffect(() => {
-		if (data) {
-			form.setFieldsValue({
-				name: data.name,
-				descr: data.descr,
-				helloText: data.helloText,
-				url: data.url,
-				externalApiKey: data.settings?.externalApiKey || undefined,
-				embedExternalApiKey: data.settings?.embedExternalApiKey || undefined,
-				temperature: data.settings?.temperature || 0.7,
-				maxTokens: data.settings?.maxTokens || 2000,
-				model: data.settings?.model || undefined,
-				systemPrompt: data.settings?.systemPrompt || "",
-				enableHistory: data.settings?.enableHistory !== false,
-				provider: data.settings?.provider || "local",
-				externalBaseUrl: data.settings?.externalBaseUrl || undefined,
-				embedProvider: data.settings?.embedProvider || "local",
-				embedExternalBaseUrl: data.settings?.embedExternalBaseUrl || undefined,
-				requestsLimit: data.settings?.requestsLimit || 100,
-				requestsWindow: data.settings?.requestsWindow || 3600,
-				embedModel: data.settings?.embedModel || undefined,
-			});
-		}
+		// Устанавливаем дефолтные значения, затем поверх них — данные с сервера (если есть)
+		form.setFieldsValue({
+			...DEFAULTS,
+			name: data?.name ?? DEFAULTS.name,
+			descr: data?.descr ?? DEFAULTS.descr,
+			helloText: data?.helloText ?? DEFAULTS.helloText,
+			url: data?.url ?? undefined,
+			externalApiKey: data?.settings?.externalApiKey || undefined,
+			embedExternalApiKey: data?.settings?.embedExternalApiKey || undefined,
+			temperature: data?.settings?.temperature ?? DEFAULTS.temperature,
+			maxTokens: data?.settings?.maxTokens ?? DEFAULTS.maxTokens,
+			model: data?.settings?.model || undefined,
+			systemPrompt: data?.settings?.systemPrompt || "",
+			enableHistory: data?.settings?.enableHistory ?? DEFAULTS.enableHistory,
+			provider: data?.settings?.provider ?? DEFAULTS.provider,
+			externalBaseUrl: data?.settings?.externalBaseUrl || undefined,
+			embedProvider: data?.settings?.embedProvider ?? DEFAULTS.embedProvider,
+			embedExternalBaseUrl: data?.settings?.embedExternalBaseUrl || undefined,
+			embedModel: data?.settings?.embedModel || undefined,
+		});
 	}, [data, form]);
 
 	const handleSubmit = (values: Record<string, unknown>) => {
