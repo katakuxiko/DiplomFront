@@ -7,6 +7,7 @@ import { LoginPage } from "./Pages/Login";
 import { Chats } from "./Pages/Chats";
 import { Chat } from "./Pages/Chat";
 import { AdminStats } from "./Pages/AdminStats";
+import { Roles } from "./Pages/Roles";
 
 const router = createBrowserRouter([
 	{
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
 			{
 				path: "admin/stats",
 				element: <AdminStats />,
+			},
+			{
+				path: "chat/:id/roles",
+				element: <Roles />,
 			},
 			{
 				path: "/settings",
