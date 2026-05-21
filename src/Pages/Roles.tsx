@@ -15,7 +15,6 @@ import { useParams } from "react-router";
 
 export const Roles = () => {
 	const { id: chatId } = useParams();
-	if (!chatId) return <div>Chat ID not provided in URL.</div>;
 	const queryClient = useQueryClient();
 	const { data } = useQuery({
 		queryKey: ["roles", chatId],
@@ -30,7 +29,7 @@ export const Roles = () => {
 			rolesService.create(chatId as string, payload),
 		onSuccess: () => {
 			message.success("Роль создана");
-			queryClient.invalidateQueries(["roles", chatId]);
+			queryClient.invalidateQueries({ queryKey: ["roles", chatId] });
 			setIsModalOpen(false);
 			form.resetFields();
 		},
@@ -41,7 +40,7 @@ export const Roles = () => {
 			rolesService.update(chatId as string, id, payload),
 		onSuccess: () => {
 			message.success("Роль обновлена");
-			queryClient.invalidateQueries(["roles", chatId]);
+			queryClient.invalidateQueries({ queryKey: ["roles", chatId] });
 			setIsModalOpen(false);
 			setEditing(null);
 			form.resetFields();
@@ -52,11 +51,13 @@ export const Roles = () => {
 		mutationFn: (id: string) => rolesService.remove(chatId as string, id),
 		onSuccess: () => {
 			message.success("Роль удалена");
-			queryClient.invalidateQueries(["roles", chatId]);
+			queryClient.invalidateQueries({ queryKey: ["roles", chatId] });
 		},
 	});
 
 	const rows = (data || []).map((r: any) => ({ key: r.id, ...r }));
+
+	if (!chatId) return <div>Chat ID not provided in URL.</div>;
 
 	return (
 		<div>
@@ -141,7 +142,7 @@ export const Roles = () => {
 						},
 					});
 				}}
-				confirmLoading={createMut.isLoading || updateMut.isLoading}
+				confirmLoading={createMut.isPending || updateMut.isPending}
 			>
 				<Form form={form} layout="vertical">
 					<Form.Item
