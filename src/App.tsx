@@ -8,7 +8,8 @@ import { Chats } from "./Pages/Chats";
 import { Chat } from "./Pages/Chat";
 import { AdminStats } from "./Pages/AdminStats";
 import { Roles } from "./Pages/Roles";
-import { Admins} from "./Pages/Admins"
+import { Admins } from "./Pages/Admins";
+import { TestingEvaluator } from "./Pages/TestingEvaluator";
 
 const router = createBrowserRouter([
 	{
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
 			{
 				path: "admin/stats",
 				element: <AdminStats />,
+			},
+			{
+				path: "admin/testing",
+				element: <TestingEvaluator />,
 			},
 			{
 				path: "chat/:id/roles",
