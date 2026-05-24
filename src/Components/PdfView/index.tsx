@@ -64,6 +64,11 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 		setContainerWidth(containerRef.current.clientWidth || 0);
 	}, [containerRef.current]);
 
+	useEffect(() => {
+		setNumPages(0);
+		setError(null);
+	}, [url]);
+
 	// Wheel zoom (Ctrl/Cmd + wheel) — window-level, passive:false, capture:true
 	useEffect(() => {
 		const handleWheel = (e: WheelEvent) => {
@@ -146,25 +151,24 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 								transition: "transform 0.15s ease-out",
 							}}
 						>
-							{Array.from(
-								new Array(numPages || 1),
-								(_el, index) => (
-									<Page
-										key={`page_${index + 1}`}
-										pageNumber={index + 1}
-										width={
-											containerWidth > 0
-												? Math.max(
-													0,
-													containerWidth * 2 - 24
-												)
-												: undefined
-										}
-										renderTextLayer={true}
-										renderAnnotationLayer={false}
-									/>
-								)
-							)}
+							{numPages > 0
+								? Array.from({ length: numPages }, (_el, index) => (
+										<Page
+											key={`page_${index + 1}`}
+											pageNumber={index + 1}
+											width={
+												containerWidth > 0
+													? Math.max(
+														0,
+														containerWidth * 2 - 24
+													)
+													: undefined
+											}
+											renderTextLayer={true}
+											renderAnnotationLayer={false}
+										/>
+								  ))
+								: null}
 						</div>
 					</div>
 				</div>

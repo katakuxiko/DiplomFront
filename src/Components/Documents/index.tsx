@@ -164,6 +164,7 @@ export const Documents = ({ id }: DocumentsProps) => {
 
 			<Drawer
 				size={1000}
+				destroyOnClose
 				onClose={() => setRowUrl(undefined)}
 				open={!!rowUrl}
 				title="Просмотр документа"
@@ -189,7 +190,7 @@ export const Documents = ({ id }: DocumentsProps) => {
 					</Popconfirm>
 				}
 			>
-				<PdfViewer url={rowUrl ?? ""} />
+				{rowUrl ? <PdfViewer key={rowUrl} url={rowUrl} /> : null}
 			</Drawer>
 		</div>
 	);
