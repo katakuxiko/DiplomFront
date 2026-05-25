@@ -221,7 +221,7 @@ export const ChatUsers = ({ id }: ChatUsersProps) => {
 				<div>
 					<Typography.Title level={4}>Пользователи чата</Typography.Title>
 					<Typography.Text type="secondary">
-						CSV/XLSX колонки: username, password, role, chat_id
+						CSV/XLSX колонки: username, password, role
 					</Typography.Text>
 				</div>
 				<Space>
