@@ -48,7 +48,9 @@ const getStoredAccessToken = (): string | null => {
 		if (!raw) {
 			return null;
 		}
-		const parsed = JSON.parse(raw) as { state?: { accessToken?: string | null } };
+		const parsed = JSON.parse(raw) as {
+			state?: { accessToken?: string | null };
+		};
 		return parsed.state?.accessToken ?? null;
 	} catch {
 		return null;
@@ -56,7 +58,10 @@ const getStoredAccessToken = (): string | null => {
 };
 
 const createMessageId = (): string => {
-	if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+	if (
+		typeof crypto !== "undefined" &&
+		typeof crypto.randomUUID === "function"
+	) {
 		return crypto.randomUUID();
 	}
 	return `${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -102,7 +107,10 @@ const streamAskQuestion = async ({
 
 	const contentType = response.headers.get("content-type") ?? "";
 	if (!contentType.includes("text/event-stream")) {
-		const fallback = (await response.json()) as { answer?: unknown; error?: unknown };
+		const fallback = (await response.json()) as {
+			answer?: unknown;
+			error?: unknown;
+		};
 		if (typeof fallback.error === "string" && fallback.error.trim() !== "") {
 			throw new Error(fallback.error);
 		}
