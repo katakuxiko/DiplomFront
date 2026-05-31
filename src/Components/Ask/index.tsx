@@ -5,6 +5,9 @@ import { SendOutlined } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "../../axios";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 interface AskProps {
 	id: string;
@@ -65,6 +68,18 @@ const createMessageId = (): string => {
 		return crypto.randomUUID();
 	}
 	return `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+};
+
+const normalizeMathDelimiters = (text: string): string => {
+	return text
+		.replace(/\\\[([\s\S]*?)\\\]/g, (_, expression: string) => {
+			const trimmed = expression.trim();
+			return trimmed ? `\n$$\n${trimmed}\n$$\n` : "";
+		})
+		.replace(/\\\(([^\n]*?)\\\)/g, (_, expression: string) => {
+			const trimmed = expression.trim();
+			return trimmed ? `$${trimmed}$` : "";
+		});
 };
 
 const streamAskQuestion = async ({
@@ -296,14 +311,21 @@ export const Ask = ({ id }: AskProps) => {
 							message.type === "me"
 								? "text-right self-end"
 								: "text-left self-start"
-						} p-3 rounded-2xl bg-white border border-gray-400/30 max-w-[80%] shadow-md overflow-y-auto`}
+						} ask-message-enter p-3 rounded-2xl bg-white border border-gray-400/30 max-w-[80%] shadow-md overflow-y-auto`}
 					>
 						<div className="self-start text-right font-semibold">
 							{message.type === "me" ? undefined : "Бот"}
 						</div>
 
 						{message.type === "bot" ? (
-							<ReactMarkdown>{message.text}</ReactMarkdown>
+							<div className="ask-markdown">
+								<ReactMarkdown
+									remarkPlugins={[remarkGfm, remarkMath]}
+									rehypePlugins={[rehypeKatex]}
+								>
+									{normalizeMathDelimiters(message.text)}
+								</ReactMarkdown>
+							</div>
 						) : (
 							message.text
 						)}
