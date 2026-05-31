@@ -115,13 +115,7 @@ export const Documents = ({ id }: DocumentsProps) => {
 	};
 
 	const mutation = useMutation({
-		mutationFn: async ({
-			file,
-			tags,
-		}: {
-			file: File;
-			tags: string[];
-		}) => {
+		mutationFn: async ({ file, tags }: { file: File; tags: string[] }) => {
 			message.loading({
 				content: "Загрузка документа...",
 				key: "uploadDoc",
@@ -228,7 +222,9 @@ export const Documents = ({ id }: DocumentsProps) => {
 			</div>
 
 			<Table
-				rowKey={(record) => record.id ?? `${record.name}-${record.created_date}`}
+				rowKey={(record) =>
+					record.id ?? `${record.name}-${record.created_date}`
+				}
 				onRow={(record) => ({
 					onClick: (e) => {
 						const target = e?.target as HTMLElement | null;
@@ -321,7 +317,9 @@ export const Documents = ({ id }: DocumentsProps) => {
 								});
 								setRowUrl(undefined);
 								queryClient.invalidateQueries({ queryKey: ["documents", id] });
-								queryClient.invalidateQueries({ queryKey: ["document-tags", id] });
+								queryClient.invalidateQueries({
+									queryKey: ["document-tags", id],
+								});
 							});
 						}}
 					>
