@@ -103,6 +103,11 @@ export interface DtoDocumentResponseDTO {
   name?: string;
   path?: string;
   protected?: boolean;
+  tags?: string[];
+}
+
+export interface DtoDocumentTagsResponse {
+  tags?: string[];
 }
 
 export interface DtoLoginRequest {
@@ -133,6 +138,7 @@ export interface ModelsDocument {
   name?: string;
   path?: string;
   protected?: boolean;
+  tags?: string[];
 }
 
 export type ModelsJSONB = Record<string, any>;
@@ -823,6 +829,8 @@ export class Api<
          * @default 10
          */
         limit?: number;
+        /** Фильтр по тэгам, JSON array или comma-separated */
+        tags?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -853,6 +861,8 @@ export class Api<
          * @format binary
          */
         file: File;
+        /** Document tags, JSON array or comma-separated list */
+        tags?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -884,6 +894,8 @@ export class Api<
          * @format binary
          */
         file: File;
+        /** Document tags, JSON array or comma-separated list */
+        tags?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -893,6 +905,31 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Возвращает уникальный список тэгов документов для конкретного чата
+     *
+     * @tags documents
+     * @name DocumentsTagsList
+     * @summary Получить доступные тэги документов чата
+     * @request GET:/documents/tags
+     * @secure
+     */
+    documentsTagsList: (
+      query: {
+        /** Chat ID (UUID) */
+        chat_id: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<DtoDocumentTagsResponse, Record<string, string>>({
+        path: `/documents/tags`,
+        method: "GET",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -948,6 +985,30 @@ export class Api<
     ) =>
       this.request<DtoDocumentResponseDTO, Record<string, string>>({
         path: `/documents/${id}/access`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Полностью заменяет тэги документа
+     *
+     * @tags documents
+     * @name DocumentsUpdateTags
+     * @summary Обновить тэги документа
+     * @request PUT:/documents/{id}/tags
+     * @secure
+     */
+    documentsUpdateTags: (
+      id: string,
+      data: { tags: string[] },
+      params: RequestParams = {},
+    ) =>
+      this.request<DtoDocumentResponseDTO, Record<string, string>>({
+        path: `/documents/${id}/tags`,
         method: "PUT",
         body: data,
         secure: true,
