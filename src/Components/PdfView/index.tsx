@@ -1,5 +1,12 @@
 import { Spin } from "antd";
-import { useEffect, useState, useRef, memo, useCallback, ComponentType } from "react";
+import {
+	ComponentType,
+	memo,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import "react-pdf/dist/Page/TextLayer.css";
 import { useAuth } from "../../store/authStore";
 
@@ -48,6 +55,7 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 				const { Document, Page, pdfjs } = pdfModule;
 				// Устанавливаем worker
 				pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+				// @ts-expect-error
 				setPdfComponent({ Document, Page });
 			})
 			.catch((err) => {
@@ -63,6 +71,11 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 		setContainerWidth(containerRef.current.clientWidth || 0);
 	}, [containerRef.current]);
 
+	useEffect(() => {
+		setNumPages(0);
+		setError(null);
+	}, [url]);
+
 	// Wheel zoom (Ctrl/Cmd + wheel) — window-level, passive:false, capture:true
 	useEffect(() => {
 		const handleWheel = (e: WheelEvent) => {
@@ -71,7 +84,7 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 				e.stopPropagation();
 				const factor = Math.exp(-e.deltaY * 0.0015);
 				setScale((prev) =>
-					Math.max(minScale, Math.min(maxScale, prev * factor))
+					Math.max(minScale, Math.min(maxScale, prev * factor)),
 				);
 			}
 		};
@@ -97,15 +110,20 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 	return (
 		<div onDoubleClick={handleDoubleClick}>
 			<Document
-				file={url ? { url: `${import.meta.env.VITE_BASE_URL}${url}`, httpHeaders: {
-					Authorization: `Bearer ${useAuth.getState().accessToken}`,
-				} } : undefined}
-				
+				file={
+					url
+						? {
+								url: `${import.meta.env.VITE_BASE_URL}${url}`,
+								httpHeaders: {
+									Authorization: `Bearer ${useAuth.getState().accessToken}`,
+								},
+							}
+						: undefined
+				}
 				onLoadSuccess={({ numPages }: { numPages: number }) => {
 					setNumPages(numPages);
 					setError(null);
 				}}
-				
 				onLoadError={(error: Error) => {
 					console.error("PDF load error:", error);
 					setError(error.message);
@@ -115,11 +133,7 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 						<Spin />
 					</div>
 				}
-				error={
-					<div>
-						Ошибка загрузки PDF: {error || "Неизвестная ошибка"}
-					</div>
-				}
+				error={<div>Ошибка загрузки PDF: {error || "Неизвестная ошибка"}</div>}
 			>
 				<div
 					ref={containerRef}
@@ -128,9 +142,7 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 					<div
 						style={{
 							width:
-								containerWidth > 0
-									? containerWidth * scale - 24
-									: undefined,
+								containerWidth > 0 ? containerWidth * scale - 24 : undefined,
 						}}
 					>
 						<div
@@ -138,32 +150,25 @@ const PdfViewerComponent = ({ url }: { url: string }) => {
 							style={{
 								transform: `scale(${scale / 2})`,
 								transformOrigin: "top left",
-								width:
-									containerWidth > 0
-										? containerWidth
-										: undefined,
+								width: containerWidth > 0 ? containerWidth : undefined,
 								transition: "transform 0.15s ease-out",
 							}}
 						>
-							{Array.from(
-								new Array(numPages || 1),
-								(_el, index) => (
-									<Page
-										key={`page_${index + 1}`}
-										pageNumber={index + 1}
-										width={
-											containerWidth > 0
-												? Math.max(
-													0,
-													containerWidth * 2 - 24
-												)
-												: undefined
-										}
-										renderTextLayer={true}
-										renderAnnotationLayer={false}
-									/>
-								)
-							)}
+							{numPages > 0
+								? Array.from({ length: numPages }, (_el, index) => (
+										<Page
+											key={`page_${index + 1}`}
+											pageNumber={index + 1}
+											width={
+												containerWidth > 0
+													? Math.max(0, containerWidth * 2 - 24)
+													: undefined
+											}
+											renderTextLayer={true}
+											renderAnnotationLayer={false}
+										/>
+									))
+								: null}
 						</div>
 					</div>
 				</div>

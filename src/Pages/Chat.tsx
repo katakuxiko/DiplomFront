@@ -5,6 +5,11 @@ import { api } from "../axios";
 import { useSetHead } from "../hooks";
 import { Documents } from "../Components/Documents";
 import { Ask } from "../Components/Ask";
+import { Settings } from "../Components/Settings";
+import { ChatUsers } from "../Components/ChatUsers";
+import { ChatHistory } from "../Components/ChatHistory";
+import { Roles } from "./Roles";
+
 
 export const Chat = () => {
 	const { id } = useParams();
@@ -20,13 +25,33 @@ export const Chat = () => {
 
 	const items = [
 		{
-			key: "1",
-			label: `Документы`,
+			key: "docs",
+			label: "Документы",
 			children: <Documents id={id!} />,
 		},
 		{
-			key: "2",
-			label: `Задать вопрос`,
+			key: "settings",
+			label: "Настройки",
+			children: <Settings id={id!} />,
+		},
+		{
+			key: "roles",
+			label: "Роли",
+			children: <Roles />,
+		},
+		{
+			key: "users",
+			label: "Пользователи",
+			children: <ChatUsers id={id!} />,
+		},
+		{
+			key: "history",
+			label: "История",
+			children: <ChatHistory id={id!} />,
+		},
+		{
+			key: "ask",
+			label: "Задать вопрос",
 			children: <Ask id={id!} />,
 		},
 	];
